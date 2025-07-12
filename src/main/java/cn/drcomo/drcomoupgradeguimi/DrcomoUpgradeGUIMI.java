@@ -3,6 +3,7 @@ package cn.drcomo.drcomoupgradeguimi;
 import cn.drcomo.corelib.config.YamlUtil;
 import cn.drcomo.corelib.gui.GUISessionManager;
 import cn.drcomo.corelib.gui.GuiManager;
+import cn.drcomo.corelib.gui.GuiActionDispatcher;
 import cn.drcomo.corelib.message.MessageService;
 import cn.drcomo.corelib.util.DebugUtil;
 import cn.drcomo.corelib.hook.placeholder.PlaceholderAPIUtil;
@@ -21,6 +22,7 @@ public final class DrcomoUpgradeGUIMI extends JavaPlugin {
     private GuiManager guiManager;
     private ConfigManager config;
     private UpgradeGui upgradeGui;
+    private GuiActionDispatcher dispatcher;
 
     @Override
     public void onEnable() {
@@ -39,9 +41,10 @@ public final class DrcomoUpgradeGUIMI extends JavaPlugin {
 
         guiManager = new GuiManager(logger);
         sessionManager = new GUISessionManager(this, logger, messages);
-        upgradeGui = new UpgradeGui(this, guiManager, sessionManager, config, logger);
+        dispatcher = new GuiActionDispatcher(logger, sessionManager, guiManager);
+        upgradeGui = new UpgradeGui(this, guiManager, sessionManager, config, logger, dispatcher);
 
-        getServer().getPluginManager().registerEvents(new cn.drcomo.drcomoupgradeguimi.listener.GuiClickListener(sessionManager, guiManager, config, logger, messages), this);
+        getServer().getPluginManager().registerEvents(new cn.drcomo.drcomoupgradeguimi.listener.GuiClickListener(sessionManager, guiManager, config, logger, messages, dispatcher), this);
         getServer().getPluginManager().registerEvents(new cn.drcomo.drcomoupgradeguimi.listener.GuiDragListener(sessionManager, guiManager, config, logger, messages), this);
         getServer().getPluginManager().registerEvents(new cn.drcomo.drcomoupgradeguimi.listener.GuiCloseListener(sessionManager, guiManager, messages, upgradeGui), this);
 

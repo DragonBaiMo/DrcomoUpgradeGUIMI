@@ -2,6 +2,7 @@ package cn.drcomo.drcomoupgradeguimi.gui;
 
 import cn.drcomo.corelib.gui.GUISessionManager;
 import cn.drcomo.corelib.gui.GuiManager;
+import cn.drcomo.corelib.gui.GuiActionDispatcher;
 import cn.drcomo.corelib.util.DebugUtil;
 import cn.drcomo.drcomoupgradeguimi.config.ConfigManager;
 import cn.drcomo.drcomoupgradeguimi.config.ConfigManager.GuiConfig;
@@ -26,6 +27,7 @@ public class UpgradeGui {
     private final ConfigManager config;
     private final DebugUtil logger;
     private final Plugin plugin;
+    private final GuiActionDispatcher dispatcher;
     private Inventory template;
 
     /**
@@ -37,18 +39,21 @@ public class UpgradeGui {
     private final Set<UUID> upgrading = ConcurrentHashMap.newKeySet();
 
     public UpgradeGui(Plugin plugin, GuiManager guiManager, GUISessionManager sessionManager,
-                       ConfigManager config, DebugUtil logger) {
+                       ConfigManager config, DebugUtil logger, GuiActionDispatcher dispatcher) {
         this.guiManager = guiManager;
         this.sessionManager = sessionManager;
         this.config = config;
         this.logger = logger;
         this.plugin = plugin;
+        this.dispatcher = dispatcher;
         buildTemplate();
+        registerCallbacks();
     }
 
     /** Rebuild template when config changes. */
     public void rebuild() {
         buildTemplate();
+        registerCallbacks();
     }
 
     private void buildTemplate() {
@@ -176,5 +181,16 @@ public class UpgradeGui {
                 }
             }
         }
+    }
+
+    private void registerCallbacks() {
+        GuiConfig cfg = config.getGuiConfig();
+        // 清理旧回调，防止重复注册
+        dispatcher.unregister(SESSION_ID);
+
+        // 关闭按钮：点击后关闭界面
+        dispatcher.register(SESSION_ID, slot -> slot == cfg.closeButtonSlot(), ctx -> {
+            ctx.player().closeInventory();
+        });
     }
 }
