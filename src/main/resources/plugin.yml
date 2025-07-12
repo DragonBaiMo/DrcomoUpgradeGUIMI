@@ -1,0 +1,5 @@
+name: DrcomoUpgradeGUIMI
+version: '1.0'
+main: cn.drcomo.drcomoupgradeguimi.DrcomoUpgradeGUIMI
+api-version: '1.18'
+authors: [ BaiMo_ ]
