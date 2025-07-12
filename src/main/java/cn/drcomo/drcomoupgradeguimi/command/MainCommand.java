@@ -41,7 +41,11 @@ public class MainCommand implements CommandExecutor {
             messages.reloadLanguages();
             upgradeGui.rebuild();
             logger.setLevel(config.getLogLevel());
-            messages.send(sender, "reload-complete");
+            if (sender instanceof Player player) {
+                messages.send(player, "reload-complete");
+            } else {
+                sender.sendMessage("Reload complete.");
+            }
             return true;
         }
         return false;

@@ -39,10 +39,10 @@ public final class DrcomoUpgradeGUIMI extends JavaPlugin {
 
         guiManager = new GuiManager(logger);
         sessionManager = new GUISessionManager(this, logger, messages);
-        upgradeGui = new UpgradeGui(guiManager, sessionManager, config, logger);
+        upgradeGui = new UpgradeGui(this, guiManager, sessionManager, config, logger);
 
         getServer().getPluginManager().registerEvents(new cn.drcomo.drcomoupgradeguimi.listener.GuiClickListener(sessionManager, guiManager, config, logger, messages), this);
-        getServer().getPluginManager().registerEvents(new cn.drcomo.drcomoupgradeguimi.listener.GuiDragListener(sessionManager, guiManager, config, messages), this);
+        getServer().getPluginManager().registerEvents(new cn.drcomo.drcomoupgradeguimi.listener.GuiDragListener(sessionManager, guiManager, config, logger, messages), this);
         getServer().getPluginManager().registerEvents(new cn.drcomo.drcomoupgradeguimi.listener.GuiCloseListener(sessionManager, guiManager, messages, upgradeGui), this);
 
         getCommand("drcomoupgrade").setExecutor(new MainCommand(upgradeGui, config, messages, logger));
@@ -50,6 +50,9 @@ public final class DrcomoUpgradeGUIMI extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (upgradeGui != null) {
+            upgradeGui.flushOnDisable();
+        }
         if (sessionManager != null) {
             sessionManager.closeAllSessions();
         }
