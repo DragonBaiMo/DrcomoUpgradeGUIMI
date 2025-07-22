@@ -55,15 +55,12 @@ public class GuiClickListener implements Listener {
             guiCfg = config.getGuiConfig();
             int rawSlot = e.getRawSlot();
             if (rawSlot == guiCfg.closeButtonSlot() || guiCfg.decorativeSlots().contains(rawSlot)) {
-                ItemStack cursor = e.getCursor();
-                if (cursor != null && !cursor.getType().isAir()) {
-                    // 玩家手上有物品时，直接取消并提示，防止物品被吞
-                    e.setCancelled(true);
-                    return;
+                e.setCancelled(true);
+                if (rawSlot == guiCfg.closeButtonSlot()) {
+                    ClickContext ctx = ClickContext.from(e, sessionManager);
+                    dispatcher.handleClick(ctx, e);
                 }
-                ClickContext ctx = ClickContext.from(e, sessionManager);
-                dispatcher.handleClick(ctx, e);
-                return; // 已处理完毕
+                return; // 已处理完毕或被拦截
             }
         }
 
