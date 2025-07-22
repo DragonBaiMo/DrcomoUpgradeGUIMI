@@ -57,6 +57,21 @@ public class GuiClickListener implements Listener {
             if (rawSlot == guiCfg.closeButtonSlot() || guiCfg.decorativeSlots().contains(rawSlot)) {
                 e.setCancelled(true);
                 if (rawSlot == guiCfg.closeButtonSlot()) {
+                    // 检查玩家手上是否有物品，如果有则返回到背包中
+                    ItemStack cursorItem = player.getItemOnCursor();
+                    if (cursorItem != null && !cursorItem.getType().isAir()) {
+                        // 先清空玩家手上的物品，再返回到背包中
+                        player.setItemOnCursor(null);
+                        
+                        if (player.getInventory().addItem(cursorItem).size() > 0) {
+                            // 如果背包已满，则掉落在地上
+                            player.getWorld().dropItem(player.getLocation(), cursorItem);
+                            messages.send(player, "item-returned-dropped");
+                        } else {
+                            messages.send(player, "item-returned");
+                        }
+                    }
+                    // 处理完物品后再调用回调
                     ClickContext ctx = ClickContext.from(e, sessionManager);
                     dispatcher.handleClick(ctx, e);
                 }
@@ -66,10 +81,12 @@ public class GuiClickListener implements Listener {
 
         // ===== 玩家背包中的 Shift 点击 / 数字键交换 等危险操作 =====
         if (clickedInv != guiInv) {
-            if (e.isShiftClick() || guiManager.isDangerousClick(e.getClick())) {
+            ClickContext ctx = ClickContext.from(e, sessionManager);
+            if (e.isShiftClick() || guiManager.isDangerousClick(ctx)) {
                 ItemStack moved = e.getCurrentItem();
                 if (moved != null && !moved.getType().isAir() && !ItemWhitelistUtil.isWhitelisted(moved, config, logger)) {
                     e.setCancelled(true);
+                    
                     messages.send(player, "invalid-item");
                 }
             }
@@ -98,10 +115,6 @@ public class GuiClickListener implements Listener {
             default -> {
                 current = e.getCursor();
             }
-        }
-        if (current == null || current.getType().isAir()) {
-            e.setCancelled(false);
-            return;
         }
         if (ItemWhitelistUtil.isWhitelisted(current, config, logger)) {
             e.setCancelled(false);

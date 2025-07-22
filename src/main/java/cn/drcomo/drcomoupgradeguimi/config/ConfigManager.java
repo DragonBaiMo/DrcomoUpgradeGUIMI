@@ -62,7 +62,8 @@ public class ConfigManager {
         }
         logLevel = LogLevel.valueOf(yamlUtil.getString("config", "debug-level", "INFO").toUpperCase());
 
-        String title = yamlUtil.getString("config", "gui.title", "&8物品升级界面");
+        // 从lang.yml中读取GUI标题，如果不存在则从config.yml中读取
+        String title = yamlUtil.getString("lang", "gui-title", yamlUtil.getString("config", "gui.title", "&8物品升级界面"));
         int size = yamlUtil.getInt("config", "gui.size", 27);
         Set<Integer> decorativeSlots = new HashSet<>();
         Map<Integer, ItemStack> decorativeItems = new HashMap<>();

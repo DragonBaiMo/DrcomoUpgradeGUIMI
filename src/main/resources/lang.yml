@@ -7,6 +7,13 @@ only-player: "&c只有玩家可以使用此指令。"
 # 无权限提示
 no-permission: "&c你没有权限执行此指令。"
 
+# GUI标题
+gui-title: "&8物品升级界面"
+
+# 物品返回提示
+item-returned: "&a物品已返回到你的背包。"
+item-returned-dropped: "&e背包已满，物品掉落在地上。"
+
 
 
 

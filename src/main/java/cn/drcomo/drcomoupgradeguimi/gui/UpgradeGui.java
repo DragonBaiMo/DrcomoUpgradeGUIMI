@@ -53,6 +53,8 @@ public class UpgradeGui {
 
     /** Rebuild template when config changes. */
     public void rebuild() {
+        // 重新加载配置以确保获取最新的GUI标题
+        config.reload();
         buildTemplate();
         registerCallbacks();
     }

@@ -31,13 +31,15 @@ public final class DrcomoUpgradeGUIMI extends JavaPlugin {
         yamlUtil.copyDefaults("", "");
         yamlUtil.loadConfig("config");
         yamlUtil.loadConfig("lang");
-        config = new ConfigManager(yamlUtil, logger);
-        config.reload();
-        logger.setLevel(config.getLogLevel());
-
+        
         PlaceholderAPIUtil papi = new PlaceholderAPIUtil(this, getName().toLowerCase());
         messages = new MessageService(this, logger, yamlUtil, papi, "lang", "");
         messages.reloadLanguages();
+        
+        // 在MessageService初始化后创建ConfigManager，确保能正确处理语言文件中的颜色代码
+        config = new ConfigManager(yamlUtil, logger);
+        config.reload();
+        logger.setLevel(config.getLogLevel());
 
         guiManager = new GuiManager(logger);
         sessionManager = new GUISessionManager(this, logger, messages);

@@ -62,25 +62,29 @@ public class MainCommand implements CommandExecutor, TabCompleter {
                 if (sender instanceof Player player) {
                     messages.send(player, "no-permission");
                 } else {
-                    sender.sendMessage("no-permission");
+                    // 使用sendRaw方法处理控制台消息，确保颜色代码能被正确处理
+                    messages.sendRaw(sender, messages.get("no-permission"));
                 }
                 return true;
             }
-            config.reload();
+            // 先重载语言文件，再重载配置，确保颜色代码能被正确处理
             messages.reloadLanguages();
+            config.reload();
             upgradeGui.rebuild();
             logger.setLevel(config.getLogLevel());
             if (sender instanceof Player player) {
                 messages.send(player, "reload-complete");
             } else {
-                sender.sendMessage("reload-complete");
+                // 使用sendRaw方法处理控制台消息，确保颜色代码能被正确处理
+                messages.sendRaw(sender, messages.get("reload-complete"));
             }
             return true;
         }
         if (sender instanceof Player player) {
             messages.sendRaw(player, "§c用法: /" + label + " [open|reload]");
         } else {
-            sender.sendMessage("用法: /" + label + " [open|reload]");
+            // 使用sendRaw方法处理控制台消息，确保颜色代码能被正确处理
+            messages.sendRaw(sender, "§c用法: /" + label + " [open|reload]");
         }
         return false;
     }
