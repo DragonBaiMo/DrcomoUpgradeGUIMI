@@ -49,13 +49,26 @@ public class GuiClickListener implements Listener {
             return;
         }
 
-        // 统一分发到 GuiActionDispatcher
-        ClickContext ctx = ClickContext.from(e, sessionManager);
-        dispatcher.handleClick(ctx, e);
+        boolean inGuiArea = clickedInv == guiInv;
+        ConfigManager.GuiConfig guiCfg = null;
+        if (inGuiArea) {
+            guiCfg = config.getGuiConfig();
+            int rawSlot = e.getRawSlot();
+            if (rawSlot == guiCfg.closeButtonSlot() || guiCfg.decorativeSlots().contains(rawSlot)) {
+                ItemStack cursor = e.getCursor();
+                if (cursor != null && !cursor.getType().isAir()) {
+                    // 玩家手上有物品时，直接取消并提示，防止物品被吞
+                    e.setCancelled(true);
+                    return;
+                }
+                ClickContext ctx = ClickContext.from(e, sessionManager);
+                dispatcher.handleClick(ctx, e);
+                return; // 已处理完毕
+            }
+        }
 
         // ===== 玩家背包中的 Shift 点击 / 数字键交换 等危险操作 =====
         if (clickedInv != guiInv) {
-            // 仅当目标可能移动到 GUI 时需要校验
             if (e.isShiftClick() || guiManager.isDangerousClick(e.getClick())) {
                 ItemStack moved = e.getCurrentItem();
                 if (moved != null && !moved.getType().isAir() && !ItemWhitelistUtil.isWhitelisted(moved, config, logger)) {
@@ -68,7 +81,7 @@ public class GuiClickListener implements Listener {
 
         // ===== 点击 GUI 内部槽位 =====
         e.setCancelled(true); // 先拦截，后续条件放行
-        ConfigManager.GuiConfig gui = config.getGuiConfig();
+        ConfigManager.GuiConfig gui = guiCfg != null ? guiCfg : config.getGuiConfig();
         int slot = e.getRawSlot();
         if (slot == gui.closeButtonSlot()) {
             player.closeInventory();

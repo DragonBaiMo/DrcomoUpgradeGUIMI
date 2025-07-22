@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.ItemFlag;
 
 import java.util.*;
 
@@ -17,7 +18,15 @@ import java.util.*;
 public class ConfigManager {
     private final YamlUtil yamlUtil;
     private final DebugUtil logger;
-    private Set<String> whitelist = new HashSet<>();
+    /**
+     * 白名单类型列表（存储小写字符串，直接为 MMOItems Type，如 "class"、"weapon" 等）。
+     */
+    private final Set<String> whitelistTypes = new HashSet<>();
+
+    /**
+     * 白名单精确 ID 列表（存储小写字符串，形如 "class;;铸刃者情报"）。
+     */
+    private final Set<String> whitelistIds = new HashSet<>();
     private GuiConfig guiConfig;
     private LogLevel logLevel = LogLevel.INFO;
 
@@ -33,8 +42,24 @@ public class ConfigManager {
     }
 
     private void parse() {
-        whitelist.clear();
-        whitelist.addAll(yamlUtil.getStringList("config", "whitelist", Collections.emptyList()));
+        // 重新读取 whitelist.type 与 whitelist.id
+        whitelistTypes.clear();
+        whitelistIds.clear();
+
+        List<String> types = yamlUtil.getStringList("config", "whitelist.type", Collections.emptyList());
+        for (String t : types) {
+            if (t != null) {
+                whitelistTypes.add(t.trim().toLowerCase());
+            }
+        }
+
+        List<String> ids = yamlUtil.getStringList("config", "whitelist.id", Collections.emptyList());
+        for (String id : ids) {
+            if (id != null) {
+                String canonical = id.replace(";;", ":").trim().toLowerCase();
+                whitelistIds.add(canonical);
+            }
+        }
         logLevel = LogLevel.valueOf(yamlUtil.getString("config", "debug-level", "INFO").toUpperCase());
 
         String title = yamlUtil.getString("config", "gui.title", "&8物品升级界面");
@@ -84,6 +109,22 @@ public class ConfigManager {
             if (section.contains("custom-model-data")) {
                 meta.setCustomModelData(section.getInt("custom-model-data"));
             }
+            if (section.contains("flags")) {
+                List<String> flagsList;
+                if (section.isList("flags")) {
+                    flagsList = section.getStringList("flags");
+                } else {
+                    flagsList = Collections.singletonList(section.getString("flags"));
+                }
+                for (String flagStr : flagsList) {
+                    try {
+                        ItemFlag flag = ItemFlag.valueOf(flagStr.toUpperCase());
+                        meta.addItemFlags(flag);
+                    } catch (IllegalArgumentException ex) {
+                        logger.log(LogLevel.WARN, "无法识别的 ItemFlag: " + flagStr);
+                    }
+                }
+            }
             item.setItemMeta(meta);
         }
         return item;
@@ -99,8 +140,27 @@ public class ConfigManager {
         return res;
     }
 
+    /**
+     * @return 精确 ID 与 Type 的并集，仅用于调试或兼容旧逻辑。
+     */
     public Set<String> getWhitelist() {
-        return whitelist;
+        Set<String> all = new HashSet<>(whitelistTypes);
+        all.addAll(whitelistIds);
+        return all;
+    }
+
+    /**
+     * @return 仅包含白名单类型的小写集合。
+     */
+    public Set<String> getWhitelistTypes() {
+        return whitelistTypes;
+    }
+
+    /**
+     * @return 仅包含精确白名单 ID（Type;;ID）的小写集合。
+     */
+    public Set<String> getWhitelistIds() {
+        return whitelistIds;
     }
 
     public GuiConfig getGuiConfig() {

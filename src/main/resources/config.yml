@@ -1,6 +1,9 @@
 whitelist:
-  - "CLASS;;铸刃者情报"
-  - "WEAPON;;神圣之剑"
+  type:
+    - "CLASS"
+  id:
+    - "CLASS:铸刃者情报"
+
 
 gui:
   title: "&8物品升级界面"
@@ -9,16 +12,25 @@ gui:
     "[0,1,2,3,5,6,7,8]":
       material: GRAY_STAINED_GLASS_PANE
       name: "&7"
+      custom-model-data: 1
+      flags:
+        - "HIDE_ATTRIBUTES"
     "[18,26]":
       material: LIGHT_GRAY_STAINED_GLASS_PANE
       name: "&8边缘"
       lore:
         - "&7这只是个边框"
+      custom-model-data: 2
+      flags:
+        - "HIDE_ATTRIBUTES"
   close-button-slot: 22
   close-button:
     material: BARRIER
     name: "&c关闭升级界面"
     lore:
       - "&7点击关闭界面"
+    custom-model-data: 3
+    flags:
+      - "HIDE_ATTRIBUTES"
 
 debug-level: INFO

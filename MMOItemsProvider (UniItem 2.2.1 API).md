@@ -117,7 +117,7 @@ public @NotNull String type()
 public @Nullable String id(@NotNull org.bukkit.inventory.ItemStack item)
 ```
 
-* **说明**：根据给定的 `ItemStack`，识别并返回其在 MMOItems 中的唯一标识符（ID）。
+* **说明**：根据给定的 `ItemStack`，识别并返回其在 MMOItems 中的唯一标识符（ID）。返回格式一般为 `TYPE:ID`，使用冒号 `:` 分隔。旧版本文档中偶见 `TYPE;;ID`，请以冒号分隔为准。
 * **参数**：
 
   * `item`（非空）— 待识别的 `ItemStack` 实例
@@ -171,3 +171,10 @@ public @Nullable org.bukkit.inventory.ItemStack item(
   * 或者 `null`（若 `id` 未注册或玩家不符合条件）
 * **实现接口**：`SimpleItemProvider.item(String, Player)`
 * **链接**：[方法文档](https://projectunified.github.io/UniItem/io/github/projectunified/uniitem/mmoitems/MMOItemsProvider.html#item%28java.lang.String,org.bukkit.entity.Player%29)
+
+---
+
+## 注意事项
+
+* `MMOItemsProvider` 的 `id(ItemStack)` 及相关方法，统一返回 `TYPE:ID` 形式（使用冒号 `:` 分隔），如 `WEAPON:神圣之剑`。
+* 建议所有集成、配置、比对等操作均以 `TYPE:ID` 作为唯一合法格式。

@@ -48,7 +48,9 @@ public final class DrcomoUpgradeGUIMI extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new cn.drcomo.drcomoupgradeguimi.listener.GuiDragListener(sessionManager, guiManager, config, logger, messages), this);
         getServer().getPluginManager().registerEvents(new cn.drcomo.drcomoupgradeguimi.listener.GuiCloseListener(sessionManager, guiManager, messages, upgradeGui), this);
 
-        getCommand("drcomoupgrade").setExecutor(new MainCommand(upgradeGui, config, messages, logger));
+        MainCommand mainCommand = new MainCommand(upgradeGui, config, messages, logger);
+        getCommand("drcomoupgrade").setExecutor(mainCommand);
+        getCommand("drcomoupgrade").setTabCompleter(mainCommand);
     }
 
     @Override

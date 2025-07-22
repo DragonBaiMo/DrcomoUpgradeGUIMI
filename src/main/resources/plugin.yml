@@ -3,7 +3,19 @@ version: '1.0'
 main: cn.drcomo.drcomoupgradeguimi.DrcomoUpgradeGUIMI
 api-version: '1.18'
 authors: [ BaiMo_ ]
+depend: [DrcomoCoreLib, MMOItems]
+
 commands:
   drcomoupgrade:
     description: Upgrade items or reload config
     usage: /<command> [open|reload]
+    aliases: [upitemgui]
+    permission: drcomoupgrade.use
+
+permissions:
+  drcomoupgrade.use:
+    description: 允许打开升级 GUI
+    default: true                # 所有人可见命令+Tab
+  drcomoupgrade.reload:
+    description: 允许重载插件
+    default: op                  # 仍然只给 OP

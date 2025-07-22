@@ -37,6 +37,7 @@ public class GuiCloseListener implements Listener {
         if (gui.isUpgrading(player)) {
             return; // 已有升级任务在运行
         }
+        messages.send(player, "upgrade-success");
         gui.processClose(player, inv);
         sessionManager.closeSession(player);
     }

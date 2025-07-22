@@ -1,2 +1,14 @@
-invalid-item: "&c该物品无法放入升级界面！"
+invalid-item: "&c该物品无法放入更新界面！"
+upgrade-success: "&a物品更新成功"
 reload-complete: "&a配置已重载。"
+open-success: "&a已打开升级界面。"
+only-player: "&c只有玩家可以使用此指令。"
+
+# 无权限提示
+no-permission: "&c你没有权限执行此指令。"
+
+
+
+
+
+
