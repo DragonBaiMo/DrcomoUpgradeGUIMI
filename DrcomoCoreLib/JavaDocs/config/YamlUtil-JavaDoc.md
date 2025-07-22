@@ -78,6 +78,14 @@
       * **参数说明:**
           * `fileName` (`String`): 文件名，**不**包含 `.yml` 后缀。
 
+  * #### `loadAllConfigsInFolder(String folderPath)`
+
+      * **返回类型:** `Map<String, YamlConfiguration>`
+      * **功能描述:** 扫描指定目录下的所有 `.yml` 文件并逐个加载，返回的映射以文件名为键，`YamlConfiguration` 为值，同时写入内部缓存。
+      * **参数说明:**
+          * `folderPath` (`String`): 相对于插件数据文件夹的目录路径。
+      * **返回值:** `Map<文件名, 配置对象>`
+
   * #### `reloadConfig(String fileName)`
 
       * **返回类型:** `void`
@@ -144,3 +152,49 @@
       * **参数说明:**
           * `fileName` (`String`): 文件名。
           * `path` (`String`): 路径。
+
+* #### `watchConfig(String configName, Consumer<YamlConfiguration> onChange)`
+
+    * **返回类型:** `YamlUtil.ConfigWatchHandle`
+    * **功能描述:** 使用 `WatchService` 监听配置文件变更。当文件内容被修改时自动
+      重载该文件并执行回调函数。等同于调用扩展方法并仅监听 `ENTRY_MODIFY` 事件。
+    * **参数说明:**
+        * `configName` (`String`): 文件名（不含 `.yml`）。
+        * `onChange` (`Consumer<YamlConfiguration>`): 变更后的回调，参数为最新配置。
+
+* #### `watchConfig(String configName, Consumer<YamlConfiguration> onChange, ExecutorService executor, WatchEvent.Kind<?>... kinds)`
+
+    * **返回类型:** `YamlUtil.ConfigWatchHandle`
+    * **功能描述:** 自定义监听事件类型并可指定执行监听任务的线程池。当 `executor`
+      为 `null` 时会创建守护线程。`kinds` 为空时默认仅监听 `ENTRY_MODIFY`。
+    * **参数说明:**
+        * `configName` (`String`): 文件名（不含 `.yml`）。
+        * `onChange` (`Consumer<YamlConfiguration>`): 变更后的回调，参数为最新配置。
+        * `executor` (`ExecutorService`): 执行监听任务的线程池，传入 `null` 时自建线程。
+        * `kinds` (`WatchEvent.Kind<?>...`): 监听的事件类型，例如 `ENTRY_CREATE`、`ENTRY_DELETE`。
+
+  * **代码示例：**
+
+    ```java
+    // 开始监听配置文件
+    YamlUtil.ConfigWatchHandle handle =
+        yamlUtil.watchConfig("config", cfg -> logger.info("配置已更新"));
+
+    // 在插件关闭或不再需要时停止监听
+    handle.close();
+    ```
+
+  * #### `stopAllWatches()`
+
+      * **返回类型:** `void`
+      * **功能描述:** 关闭并清理所有由 `watchConfig` 创建的监听器。通常在插件停用
+        时调用，以避免后台线程泄露。
+
+  * #### `getValue(String path, Class<T> type, T defaultValue)`
+
+      * **返回类型:** `<T>`
+      * **功能描述:** 从默认 `config.yml` 中按给定类型读取值。若路径不存在或类型不符，会写入并返回 `defaultValue`。
+      * **参数说明:**
+          * `path` (`String`): 配置路径。
+          * `type` (`Class<T>`): 期望的类型，例如 `String.class`。
+          * `defaultValue` (`T`): 默认值。

@@ -65,6 +65,24 @@
             return false;
         }
         ```
+        
+  * #### `switchLanguage(String newPath)`
+
+      * **返回类型:** `void`
+      * **功能描述:** 切换语言文件路径并立即重新加载消息。
+      * **参数说明:**
+          * `newPath` (`String`): 新的语言文件路径（不含 `.yml`）。
+      * **使用示例:**
+        ```java
+        messageService.switchLanguage("languages/en_US");
+        ```
+
+  * #### `setKeyPrefix(String newPrefix)`
+
+      * **返回类型:** `void`
+      * **功能描述:** 动态修改所有消息键的统一前缀。
+      * **参数说明:**
+          * `newPrefix` (`String`): 新前缀，可为 `null`。
 
   * #### `getRaw(String key)`
 
@@ -114,9 +132,9 @@
   * #### `getList(String key)`
 
       * **返回类型:** `List<String>`
-      * **功能描述:** 从语言文件中获取一个字符串列表，通常用于发送多行消息（如 a）。
+      * **功能描述:** 从语言文件中获取一个字符串列表，通常用于发送多行消息。若设置了 `keyPrefix`，在传入的键缺少该前缀时会自动补全。
       * **参数说明:**
-          * `key` (`String`): 消息列表在 YAML 文件中的键。
+          * `key` (`String`): 消息列表在 YAML 文件中的键（可省略前缀）。
       * **使用示例:**
         ```java
         // yml中:
@@ -129,9 +147,9 @@
   * #### `parseList(String key, Player player, Map<String, String> custom)`
 
       * **返回类型:** `List<String>`
-      * **功能描述:** 获取一个消息列表，并对列表中的每一行字符串都执行完整的、多阶段的占位符解析。
+      * **功能描述:** 获取一个消息列表，并对列表中的每一行字符串都执行完整的、多阶段的占位符解析。若传入的键未包含 `keyPrefix`，会先通过 `getList` 自动补全。
       * **参数说明:**
-          * `key` (`String`): 消息列表的键。
+          * `key` (`String`): 消息列表的键（可省略前缀）。
           * `player` (`Player`): 上下文玩家。
           * `custom` (`Map<String, String>`): 自定义占位符 Map。
       * **使用示例:**
@@ -163,6 +181,21 @@
             return "无效参数";
         });
         ```
+
+  * #### `setInternalPlaceholderPattern(Pattern pattern)`
+
+      * **返回类型:** `void`
+      * **功能描述:** 自定义内部占位符的匹配正则。
+      * **参数说明:**
+          * `pattern` (`Pattern`): 新的匹配模式。
+
+  * #### `addPlaceholderRule(Pattern pattern, BiFunction<Player, Matcher, String> resolver)`
+
+      * **返回类型:** `void`
+      * **功能描述:** 新增一条基于正则的自定义占位符解析规则。
+      * **参数说明:**
+          * `pattern` (`Pattern`): 用于匹配占位符的正则。
+          * `resolver` (`BiFunction<Player, Matcher, String>`): 当匹配到占位符时调用的解析函数。
 
   * #### `send(Player player, String key)`
 
@@ -261,6 +294,15 @@
           * `player` (`Player`): 目标玩家。
           * `messages` (`List<String>`): 已经解析和处理好颜色的消息列表。
 
+  * #### `sendActionBar(Player player, String key, Map<String, String> custom)`
+
+      * **返回类型:** `void`
+      * **功能描述:** 解析并通过 ActionBar 向玩家发送单行消息。
+      * **参数说明:**
+          * `player` (`Player`): 目标玩家。
+          * `key` (`String`): 消息键。
+          * `custom` (`Map<String, String>`): 自定义占位符。
+
   * #### `sendStagedActionBar(Player player, List<String> messages)`
 
       * **返回类型:** `void`
@@ -268,6 +310,16 @@
       * **参数说明:**
           * `player` (`Player`): 目标玩家。
           * `messages` (`List<String>`): 要在 ActionBar 上显示的消息列表。
+
+  * #### `sendTitle(Player player, String titleKey, String subKey, Map<String, String> custom)`
+
+      * **返回类型:** `void`
+      * **功能描述:** 解析并向玩家发送标题和副标题。
+      * **参数说明:**
+          * `player` (`Player`): 目标玩家。
+          * `titleKey` (`String`): 主标题的消息键。
+          * `subKey` (`String`): 副标题的消息键。
+          * `custom` (`Map<String, String>`): 自定义占位符。
 
   * #### `sendStagedTitle(Player player, List<String> titles, List<String> subtitles)`
 
