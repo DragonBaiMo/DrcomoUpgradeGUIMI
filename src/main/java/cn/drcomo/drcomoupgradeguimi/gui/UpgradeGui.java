@@ -29,6 +29,7 @@ public class UpgradeGui {
     private final Plugin plugin;
     private final GuiActionDispatcher dispatcher;
     private Inventory template;
+    private String templateTitle;
 
     /**
      * 单例化的 MMOItems 提供者，避免频繁创建实例。
@@ -58,16 +59,28 @@ public class UpgradeGui {
 
     private void buildTemplate() {
         GuiConfig cfg = config.getGuiConfig();
-        template = Bukkit.createInventory(null, cfg.size(), cfg.title());
+        templateTitle = cfg.title();
+        template = Bukkit.createInventory(null, cfg.size(), templateTitle);
         for (Map.Entry<Integer, ItemStack> e : cfg.decorativeItems().entrySet()) {
             template.setItem(e.getKey(), e.getValue());
         }
         template.setItem(cfg.closeButtonSlot(), cfg.closeButtonItem());
     }
 
+    /**
+     * Create a fresh inventory using {@link #template} as prototype.
+     * The new inventory has identical size, title and contents but is
+     * independent from the template.
+     */
+    private Inventory copyTemplate() {
+        Inventory inv = Bukkit.createInventory(null, template.getSize(), templateTitle);
+        inv.setContents(Arrays.copyOf(template.getContents(), template.getSize()));
+        return inv;
+    }
+
     /** Open GUI for player. */
     public void open(Player player) {
-        sessionManager.openSession(player, SESSION_ID, p -> template);
+        sessionManager.openSession(player, SESSION_ID, p -> copyTemplate());
         logger.debug("Open gui for " + player.getName());
     }
 
