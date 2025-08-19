@@ -1,169 +1,108 @@
-> **作者：BaiMo_**  
-> **开发理念关键词：第一性原理 / DRY / KISS / SOLID / YAGNI**  
-> **目标：保持清晰沟通、可扩展架构、安全可控、代码高质、维护高效**
+# Development Guidelines (Win11 / PowerShell)
+
+**Author:** BaiMo_  
+**Principles:** First Principles, DRY, KISS, SOLID, YAGNI  
+**Goals:** Clear communication, scalable architecture, high code quality, efficient and safe maintenance
 
 ---
 
-## 二、设计规划与架构原则
-1. **从业务需求出发**  
-   - 所有设计必须基于实际业务场景，避免过度抽象或复杂化；  
-   - 先明确核心功能，再考虑扩展性。
-   - 
-2. **模块清晰职责单一**  
-   - 遵循 **SRP（单一职责原则）**，将指令处理、监听事件、配置管理、核心逻辑等拆分为独立模块。  
-   - 每个模块都应有明确的输入/输出接口及错误处理策略。
+## ## 1. Communication & Requirement Confirmation
 
-3. **从领域抽象出核心接口**  
-   - 按“第一性原理”思路，将业务概念抽象为最基础的接口与模型。  
-   - 接口定义需完整描述方法功能、参数、返回值和可能抛出的异常。
+- **Language:** All communication, comments, and logs must be in Chinese. Do not mix languages.
 
-4. **可扩展性优先**  
-   - 所有可扩展逻辑必须基于接口或抽象类；  
-   - 新功能实现前，先排查仓库中是否已有可复用组件，如无，则新增接口并在主实现中注入。
+- **Resource Usage:** Only use interfaces, APIs, or libraries I explicitly provide or are publicly documented. Do not use reflection or dynamic method/path construction to bypass checks.
 
-5. **五大开发原则嵌入设计层**  
-   - **DRY**：禁止复制粘贴逻辑；相似逻辑必须抽取公共方法或工具类。  
-   - **KISS**：保持架构和代码简洁，避免过度设计。  
-   - **SOLID**：严格遵守单一职责、开放封闭、里氏替换、接口隔离、依赖倒置等原则。  
-   - **YAGNI**：只实现当前需求所需功能，不做未确认的未来拓展。
+- Use `TODO` with explanation when a solution cannot be found, and do not implement guesswork or placeholder logic.
 
-6. **方法／类体量控制**  
-   - 建议每个方法不超过 30 行，每个类控制在 30～200 行之间；  
-   - 单文件超过 500 行必须拆分，并在文件头添加模块说明与使用示例。
-
-7. **目录结构与分层**  
-   - 推荐采用清晰的分层目录：  
-     ```
-     ├─domain/         # 领域模型与接口定义  
-     ├─service/        # 服务层或业务逻辑  
-     ├─repository/     # 数据持久化或外部资源接入  
-     ├─controller/     # 命令、HTTP、CLI 等入口  
-     └─util/           # 通用工具与辅助类  
-     ```
 
 ---
 
-## 三、编码规范与质量控制
+## 2. Design & Architecture
 
-1. **命名规范**  
-   - 变量、方法、类名必须清晰表达业务含义，遵循驼峰或 PascalCase；  
-   - 常量使用全大写加下划线。
-
-2. **格式化与静态分析**  
-   - 项目中必须启用格式化（如 Prettier、EditorConfig）和静态分析工具（如 Checkstyle、SpotBugs）；  
-   - CI 中强制检查不通过则禁止合并。
-
-3. **文档注释**  
-   - 所有公共 API、暴露方法均需 JavaDoc 标准格式注释，说明用途、参数、返回值、异常；  
-   - 复杂逻辑处要补充“设计背景”“为何如此”说明，而非仅描述“做了什么”。
-
-4. **禁止重复造轮子**  
-   - 实现新功能前，必须全局搜索项目是否已有类似实现；  
-   - 若已有，则优先复用并在必要时通过装饰或适配器模式扩展。
-
-5. **合并写入**  
-   - 同一文件中相关改动应一次性提交，避免频繁小幅提交引起审阅成本。
-
-6. **导包策略**  
-   - 禁止“写顶层导包再补代码”的习惯；  
-   - 推荐在编码过程中随用随导，或者编写完成后统一整理导入区。
-
-7. **禁止硬编码**  
-   - 所有可配置或可替换内容必须通过配置文件或常量管理，不得写死在代码中；  
-   - 配置文件首次加载时，若目录或示例文件不存在，则自动创建并复制示例；否则不覆盖用户修改。
-
-8. **示例配置同步**  
-   - 对应每个功能模块的配置文件，都须维护一份示例（如 `config-example.yml`），并在配置说明文档中同步更新。
+- **Design First:** Plan before coding complex logic or new features.
+    
+- **Single Responsibility & Modularity:** Separate logic, events, configs, etc. Follow SRP and SOLID principles.
+    
+- **Interface-Driven:** Abstract core logic via interfaces and models based on first principles. Prioritize extensibility.
+    
+- **Reuse Over Rebuild:** Reuse or extend existing code before adding new logic. Avoid code duplication (DRY).
+    
+- **KISS & YAGNI:** Keep code simple; implement only what is needed now.
+    
+- **Code Size:** Methods/classes 30–200 lines; split files over 500 lines, with documentation.
+    
+- **Directory Structure:** For large projects, use clear layered folders (e.g., `domain/`, `service/`, `controller/`).
 
 ---
 
-## 四、异步任务与性能控制
+## 3. Coding Standards & Quality
 
-1. **异步优先评估**  
-   - 对 IO、网络、长时间计算等场景，首选异步实现；  
-   - 异步设计前务必分析并规避线程安全和竞态问题。
-
-2. **线程安全回调**  
-   - 主线程状态更新必须通过安全回调或事件机制；  
-   - 若无法保证线程安全，需切换为同步执行并注明原因。
-
-3. **异常保护与降级**  
-   - 异步逻辑需捕获异常并进行降级处理，避免任务失效导致主流程中断。
-
----
-
-## 五、安全性要求
-
-1. **输入验证**  
-   - 严格校验所有外部输入，包含格式、长度、类型、取值范围；  
-   - 推荐使用白名单机制。
-
-2. **敏感信息保护**  
-   - 密钥、密码等必须加密或加盐存储；  
-   - 严禁在日志或配置文件中明文暴露。
-
-3. **权限控制**  
-   - 所有敏感操作前必须做权限校验；  
-   - 遵循最小权限原则，避免过度授权。
-
-4. **漏洞防护**  
-   - 主动防范 SQL 注入、命令注入、路径遍历、XSS、DoS 等常见攻击。
+- **Naming:** Use clear, business-relevant names for variables, methods, and classes.
+    
+- **Tools:** Enforce code formatting and static analysis.
+    
+- **Documentation:** Public APIs/classes/interfaces require complete JavaDoc-style comments (purpose, parameters, return, exceptions, etc.). Complex logic must explain “why”, not just “what”.
+    
+- **Edit Merging:** Batch related changes; avoid one-line commits unless necessary.
+    
+- **Imports:** Import packages as needed, not in advance.
+    
+- **Configuration:** Never hardcode user-editable content. Config files should auto-generate only if missing. Sync sample config files with logic.
 
 ---
 
-## 六、数据与资源管理规范
+## 4. Asynchronous Tasks & Performance
 
-1. **持久化设计**  
-   - 在内存中处理后再统一写入持久层；  
-   - 数据库操作必须使用参数化查询或 ORM，严禁字符串拼接 SQL。
-
-2. **资源释放**  
-   - 文件、数据库连接、Socket 等使用后必须显式关闭或归还连接池；  
-   - 推荐使用 try-with-resources 或类似框架自动管理。
+- **Async Usage:** IO/network/cpu-heavy operations should be async, with prior risk analysis.
+    
+- **Thread Safety:** Main thread state updates must be safe. Use sync when unsure and document reasons.
+    
+- **Fallbacks:** Protect async logic with exception handling and fallback strategies.
 
 ---
 
-## 七、自定义配置与国际化支持
+## 5. Security
 
-1. **界面与提示国际化**  
-   - 所有用户可见文本必须从配置或资源文件中读取，支持多语言切换；  
-   - 禁止任何硬编码提示。
-
-2. **动态加载**  
-   - 支持运行时热载入配置，便于线上快速调整。
-
----
-
-## 八、日志、调试与错误处理
-
-1. **日志输出**  
-   - 关键路径（状态变更、异常捕获、重要分支）必须输出中文日志；  
-   - 日志分级管理（DEBUG/INFO/WARN/ERROR），上线时可根据配置动态调整。
-
-2. **敏感信息屏蔽**  
-   - 日志中不得打印敏感字段，必要时脱敏处理。
-
-3. **错误处理**  
-   - 捕获所有可预见异常并给出友好提示或自动重试；  
-   - 对不可恢复异常进行上报或熔断处理。
+- **Input Validation:** Never trust external input. Enforce strict checks and whitelist strategies.
+    
+- **Sensitive Data:** Encrypt/store passwords & keys safely. Do not log sensitive info.
+    
+- **Permissions:** Enforce permission checks for all sensitive actions; follow least privilege.
+    
+- **Vulnerabilities:** Actively prevent SQL/command injection, path traversal, XSS, DoS, etc.
 
 ---
 
-## 九、开发中待办管理
+## 6. Data & Resource Management
 
-1. **TODO 标记**  
-   - 功能未实现、临时方案、性能待优化、已知问题等，必须添加 `// TODO: <目的+思路>` 注释；  
-   - TODO 内容需简要说明本次目的及后续处理思路。
+- **Persistence:** Operate in memory first, then persist; use parameterized queries for DB.
+    
+- **Resource Management:** Release files, DB connections, sockets after use; use connection pools as needed.
 
 ---
 
-## ✅ 最终原则总结
+## 7. Customization & Internationalization
 
-> **始终贯彻五大核心理念**：  
-> **第一性原理：** 从本质建模抽象接口；  
-> **DRY：** 绝不重复；  
-> **KISS：** 保持简洁；  
-> **SOLID：** 单一职责、接口隔离、依赖倒置；  
-> **YAGNI：** 不做未用的设计。
+- **Configurable Content:** UI texts and prompts must be in config files for localization; never hardcoded.
 
-**以规划优先为核心，以安全可靠为底线，以可维护可扩展为目标。**
+---
+
+## 8. Logging & Error Handling
+
+- **Logging:** Key actions and exceptions require logs in Chinese, but never include sensitive data.
+    
+- **Debug Levels:** Use graded logging for easier troubleshooting.
+
+---
+
+## 9. TODO Management
+
+- **Mark TODOs:** For unfinished, temporary, or pending tasks, mark with `// TODO` and a clear reason.
+
+---
+
+## Final Principles
+
+Always follow these philosophies:  
+**First Principles** (abstract from fundamentals), **DRY** (no duplication), **KISS** (keep simple), **SOLID** (modular and maintainable), **YAGNI** (no premature design).  
+**Clarity, planning, security, maintainability, and extensibility are the foundation of all work.**
